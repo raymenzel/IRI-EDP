@@ -1,4 +1,4 @@
-makefile_path := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+makefile_path := $(realpath $(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
 
 CC = gcc
 CFLAGS = -g -O0 -Wall -Wextra -pedantic -std=c99
@@ -21,7 +21,7 @@ libiri2016.so: $(IRI_SOURCES)
 iri_2016.o: $(makefile_path)/src/iri_2016.c
 	$(CC) $(CFLAGS) -o $@ -c $< -fPIC
 
-iri_c_interface.o: $(makfile_path)/src/iri_c_interface.f90
+iri_c_interface.o: $(makefile_path)/src/iri_c_interface.f90
 	$(FC) $(FCFLAGS) -o $@ -c $< -fPIC
 
 iri-2016.x: iri_2016.o iri_c_interface.o
