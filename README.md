@@ -15,20 +15,21 @@ $ cd IRI-EDP
 A docker image can be built by:
 
 ```
-$ docker build -t iri-edp:latest .
+$ sudo docker build -t iri-edp:latest .
 ```
 
 After building the image, you can enter the container environment by running:
 
 ```
-$ docker run iri-edp:latest
+$ sudo docker run -it --entrypoint /bin/bash iri-edp:latest
 ```
 
 ##### Linux
 This application requires the following dependencies:
 - bash
-- wget
 - tar
+- wget
+- make
 - gcc
 - gfortran
 - gnuplot
