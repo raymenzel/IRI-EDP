@@ -1,0 +1,14 @@
+name: build-docker-image
+run-name: build-docker-image
+
+on: [push]
+
+jobs:
+  docker-build:
+    name: docker-build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Build docker image
+        run: sudo docker build -t iri-edp:latest .
