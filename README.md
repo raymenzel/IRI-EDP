@@ -25,7 +25,7 @@ $ sudo docker run -it --entrypoint /bin/bash iri-edp:latest \
     --mount type=bind,src=<host-path>,dst=/IRI-EDP/outputs
 ```
 
-Fill in `<host-path>` with the location you want the generated figures to go.
+Fill in `<host-path>` with the location you want the generated figures to go to.
 Once inside the container, you can run the application by copying it into
 the provided `run` directory and executing it:
 
@@ -36,6 +36,7 @@ the provided `run` directory and executing it:
 # ./iri-2016.x --help
 ```
 
+<a name="run-tag"></a>
 The executable takes the following arguments:
 
 ```
@@ -65,11 +66,12 @@ For example, runing a profile at (37.8 N, -75.4 E) on 3/3/2021 at 11:00:00 UTC:
 ./iri-2016.x 37.8 -75.4 2021 3 3 11
 ```
 
-produces a file name `2021-03-03-11-UTC-EDP.png` containing:
+produces a file name `2021-03-03-11-UTC-EDP.png` in the current directory containing:
 
 ![EDP-profile](docs/2021-03-03-11-UTC-EDP.png)
 
-To make it available outside of the container, copy it to `/IRI-EDP/output:
+If you'd like to make this plot available outside of the container, copy it
+to `/IRI-EDP/output:
 
 ```
 $ cp 2021-03-03-11-UTC-EDP.png /IRI-EDP/output
@@ -98,14 +100,11 @@ $ make
 
 This will create an executable `iri-2016.x` in the current directory.
 A run directory was set up when the `download-IRI-2016.bash` script was run.
-Copy the created `iri-2016.x` executable into the run directory:
+Copy the created `iri-2016.x` executable into the run directory and go there:
 
 ```
 $ cp iri-2016.x run
-```
-Next, go into the run directory and run the exectuable:
-
-```
 $ cd run
-$ ./iri-2016.x
 ```
+
+The executable can run [following these instructions](#run-tag).
