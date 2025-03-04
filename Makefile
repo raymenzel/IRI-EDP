@@ -28,7 +28,7 @@ argparse.o: $(makefile_path)/src/argparse.c
 	$(CC) $(CFLAGS) -I$(makefile_path)/src -o $@ -c $< -fPIC
 
 iri-2016.x: iri_2016.o argparse.o iri_c_interface.o
-	$(FC) -o $@ $^ -L$(makefile_path) -liri2016 -fPIC -Wl,-rpath $(makefile_path)
+	$(FC) -o $@ $^ -L$(makefile_path) -liri2016 -lm -fPIC -Wl,-rpath $(makefile_path)
 
 test: test/test_iri_c_interface.f90
 	$(FC) $(FCFLAGS) -o $@ $^ -L$(makefile_path) -liri2016 -fPIC -Wl,-rpath $(makefile_path)

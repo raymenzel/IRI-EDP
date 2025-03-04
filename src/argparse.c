@@ -63,7 +63,7 @@ static char * basename(char *path, /*File path.*/
 static void print_usage(Parser_t const p /*Parser.*/
                        )
 {
-    printf("\033[3mUsage: %s ", basename(p.argv[0], '/'));
+    printf("Usage: %s ", basename(p.argv[0], '/'));
     Argument_t *a = p.args;
     while (a != NULL)
     {
@@ -81,7 +81,7 @@ static void print_usage(Parser_t const p /*Parser.*/
         }
         a = a->head;
     }
-    printf("\n\033[0m");
+    printf("\n");
     return;
 }
 
@@ -91,7 +91,7 @@ static void print_help(Parser_t const p /*Parser.*/
                       )
 {
     print_usage(p);
-    printf("\033[3m\n%s - %s\n", basename(p.argv[0], '/'), p.description);
+    printf("\n%s - %s\n", basename(p.argv[0], '/'), p.description);
     Argument_t *a = p.args;
     if (p.num_pos_args > 0)
     {
@@ -144,7 +144,6 @@ static void print_help(Parser_t const p /*Parser.*/
         }
         a = a->head;
     }
-    printf("\033[0m");
     return;
 }
 
@@ -256,6 +255,7 @@ void parse_args(Parser_t const p)
         int one_dash = 0;
         int two_dash = 0;
         check_name(p.argv[i], &one_dash, &two_dash, valuelen);
+        int found = 0;
         if (two_dash || one_dash)
         {
             if (strcmp(p.argv[i], "-h") == 0 || strcmp(p.argv[i], "--help") == 0)
@@ -297,12 +297,13 @@ void parse_args(Parser_t const p)
                         }
                     }
                     a->found = 1;
+                    found = 1;
                     break;
                 }
                 a = a->head;
             }
         }
-        else
+        if (!found)
         {
             num_pos_args++;
             Argument_t *a = p.args;

@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -38,8 +39,8 @@ int main(int argc, char ** argv)
     char * description = "Calculates electron density profiles using IRI 2016.";
     int one = 1;
     Parser_t parser = create_parser(argc, argv, description);
-    add_argument(&parser, "longitude", NULL, "Longitude [Degrees north].", NULL);
-    add_argument(&parser, "latitude", NULL, "Latitude [Degrees east].", NULL);
+    add_argument(&parser, "latitude", NULL, "Latitude [Degrees north].", NULL);
+    add_argument(&parser, "longitude", NULL, "Longitude [Degrees east].", NULL);
     add_argument(&parser, "year", NULL, "Year of the desired profile.", NULL);
     add_argument(&parser, "month", NULL, "Month of tht desired profile..", NULL);
     add_argument(&parser, "day", NULL, "Day of the desired profile.", NULL);
@@ -47,6 +48,7 @@ int main(int argc, char ** argv)
     add_argument(&parser, "-z", NULL, "Minimum altitude [km] (Default: 80).", &one);
     add_argument(&parser, "-Z", NULL, "Maximum altitude [km] (Default: 1000).", &one);
     add_argument(&parser, "-dz", NULL, "Altitude grid spacing [km] (Default 20).", &one);
+    add_argument(&parser, "-p", NULL, "Plot plasma frequency instead of number density.", NULL);
     parse_args(parser);
 
     /*Set arguments to IRI.*/
@@ -69,10 +71,17 @@ int main(int argc, char ** argv)
 
     get_argument(parser, "hour", buffer);
     float hour = atof(buffer);
+    if (hour < 0. || hour > 24.)
+    {
+        fprintf(stderr, "Error: the input hour %f must be >= 0 and <= 24.\n", hour);
+        return EXIT_FAILURE;
+    }
+    hour += 25.; /*IRI assumes that it is local time unless this is >= 25.*/
 
     float altitude_lower = get_argument(parser, "-z", buffer) ? atof(buffer) : 80.;
     float altitude_upper = get_argument(parser, "-Z", buffer) ? atof(buffer) : 600.;
     float daltitude = get_argument(parser, "-dz", buffer) ? atof(buffer) : 20.;
+    int output_type = get_argument(parser, "-p", buffer) ? 1 : 0;
 
     int coordinate_system = GEOGRAPHIC;
     float output[20000];
@@ -102,7 +111,7 @@ int main(int argc, char ** argv)
     struct tm input_time = {
         .tm_sec = 0,
         .tm_min = 0,
-        .tm_hour = (int)hour,
+        .tm_hour = (int)(hour - 25.),
         .tm_mday = date % 100,
         .tm_mon = (date - (date % 100))/100 - 1,
         .tm_year = year - 1900,
@@ -124,20 +133,37 @@ int main(int argc, char ** argv)
     /*Initialize the plot.*/
     fprintf(pipe, "set terminal png lw 3 \n");
     fprintf(pipe, "set output '%s-EDP.png' \n", file_tag);
-    fprintf(pipe, "set title \"EDP for %s\\nLocation: %4.1f E, %4.1f N\" \n",
-            date_string, longitude_east, latitude_north);
-    fprintf(pipe, "set xlabel \"Electron Number Density [m-3]\" \n");
+    fprintf(pipe, "set title \"EDP for %s\\nLocation: %4.1f N, %4.1f E\" \n",
+            date_string, latitude_north, longitude_east);
+    if (output_type)
+    {
+        fprintf(pipe, "set xlabel \"Plasma Frequency [MHz]\" \n");
+    }
+    {
+        fprintf(pipe, "set xlabel \"Electron Number Density [cm-3]\" \n");
+    }
     fprintf(pipe, "set ylabel \"Altitude [km]\" \n");
     fprintf(pipe, "set key noautotitle \n");
     fprintf(pipe, "set key noautotitle \n");
     fprintf(pipe, "plot '-' with lines \n");
+
+    /*Conversion factor from sqrt(electron_density [m-3]) to MHz.*/
+    float to_MHz = 8.978359105589245e-06; /* [ m1.5 MHz ] */
 
     /*Decode the output and pass it to gnuplot.*/
     int num_altitudes = (altitude_upper - altitude_lower)/daltitude + 1;
     for (i=0; i<num_altitudes; ++i)
     {
         float altitude = altitude_lower + i*daltitude;
-        float electron_density = output[i*20];
+        float electron_density;
+        if (output_type)
+        {
+            electron_density = sqrtf(output[i*20])*to_MHz; /*[MHz].*/
+        }
+        else
+        {
+            electron_density = output[i*20]*1.e-6; /*[cm-3].*/
+        }
         fprintf(pipe, "%e %e\n", electron_density, altitude);
     }
     fprintf(pipe, "exit \n");
