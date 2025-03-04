@@ -1,21 +1,24 @@
 name: compile-and-test
 run-name: compile-and-test
+
 on: [push]
+
 jobs:
-  install-dependencies:
-    name: Install dependencies
+  compile-and-test:
+    name: compile-and-test
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - run: apt-get update && apt-get install -y build-essential
-      - run: apt-get update && apt-get install -y wget
-      - run: apt-get update && apt-get install -y gfortran
-      - run: apt-get update && apt-get install -y gnuplot
-      - run: bash download-IRI-2016.bash
-
-  compile:
-    name: Compile
-    needs: install-dependencies
-    steps:
-      - run: make
-      - run: cp iri-2016 run
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          apt-get update && apt-get install -y build-essential
+          apt-get update && apt-get install -y wget
+          apt-get update && apt-get install -y gfortran
+          apt-get update && apt-get install -y gnuplot
+      - name: Download IRI 2016 and create run directory
+        run: bash download-IRI-2016.bash
+      - name: Compile
+        run: make
+      - name: Run the example.
+        run: bash example.bash
