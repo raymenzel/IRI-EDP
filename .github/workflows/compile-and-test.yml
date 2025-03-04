@@ -12,10 +12,10 @@ jobs:
         uses: actions/checkout@v4
       - name: Install dependencies
         run: |
-          sudo apt-get update && apt-get install -y build-essential
-          sudo apt-get update && apt-get install -y wget
-          sudo apt-get update && apt-get install -y gfortran
-          sudo apt-get update && apt-get install -y gnuplot
+          sudo apt-get update && sudo apt-get install -y build-essential
+          sudo apt-get update && sudo apt-get install -y wget
+          sudo apt-get update && sudo apt-get install -y gfortran
+          sudo apt-get update && sudo apt-get install -y gnuplot
       - name: Download IRI 2016 and create run directory
         run: bash download-IRI-2016.bash
       - name: Compile
