@@ -60,7 +60,7 @@ Optional arguments:
 -p                                            Plot plasma frequency instead of number density.
 ```
 
-For example, runing a profile at (37.8 N, -75.4 E) on 3/3/2021 at 11:00:00 UTC:
+For example, running a profile at (37.8 N, -75.4 E) on 3/3/2021 at 11:00:00 UTC:
 
 ```
 ./iri-2016.x 37.8 -75.4 2021 3 3 11
