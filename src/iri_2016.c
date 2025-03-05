@@ -79,7 +79,7 @@ int main(int argc, char ** argv)
     hour += 25.; /*IRI assumes that it is local time unless this is >= 25.*/
 
     float altitude_lower = get_argument(parser, "-z", buffer) ? atof(buffer) : 80.;
-    float altitude_upper = get_argument(parser, "-Z", buffer) ? atof(buffer) : 600.;
+    float altitude_upper = get_argument(parser, "-Z", buffer) ? atof(buffer) : 1000.;
     float daltitude = get_argument(parser, "-dz", buffer) ? atof(buffer) : 20.;
     int output_type = get_argument(parser, "-p", buffer) ? 1 : 0;
 
@@ -101,6 +101,24 @@ int main(int argc, char ** argv)
     {
         options[off_switch_indices[i] - 1] = 0;
     }
+
+    /*Right out the options used to a log file.*/
+    char * log_name = "iri_2016.log";
+    FILE * log = fopen(log_name, "w");
+    if (log == NULL)
+    {
+        fprintf(stderr, "Error: opening %s failed.\n", log_name);
+        return EXIT_FAILURE;
+    }
+    fprintf(log, "Latitude: %e\n", latitude_north);
+    fprintf(log, "Longitude: %e\n", longitude_east);
+    fprintf(log, "year: %d\n", year);
+    fprintf(log, "date: %d\n", date);
+    fprintf(log, "hour: %e\n", hour);
+    fprintf(log, "Lowest altitude: %e\n", altitude_lower);
+    fprintf(log, "Highest altitude: %e\n", altitude_upper);
+    fprintf(log, "Altitude step: %e\n", daltitude);
+    fprintf(log, "\nAltitude,Electron density\n");
 
      /*Call the fortran routines.*/
     iri_main(options, coordinate_system, latitude_north,
@@ -141,6 +159,7 @@ int main(int argc, char ** argv)
     }
     {
         fprintf(pipe, "set xlabel \"Electron Number Density [cm-3]\" \n");
+        fprintf(pipe, "set format x \"%%1.1e\" \n");
     }
     fprintf(pipe, "set ylabel \"Altitude [km]\" \n");
     fprintf(pipe, "set key noautotitle \n");
@@ -159,10 +178,12 @@ int main(int argc, char ** argv)
         if (output_type)
         {
             electron_density = sqrtf(output[i*20])*to_MHz; /*[MHz].*/
+            fprintf(log, "%e,%e\n", altitude, electron_density);
         }
         else
         {
             electron_density = output[i*20]*1.e-6; /*[cm-3].*/
+            fprintf(log, "%e,%d\n", altitude, (int)(electron_density + 0.5));
         }
         fprintf(pipe, "%e %e\n", electron_density, altitude);
     }
@@ -176,5 +197,7 @@ int main(int argc, char ** argv)
         return EXIT_FAILURE;
     }
 
+    /*Close the log file.*/
+    fclose(log);
     return EXIT_SUCCESS;
 }

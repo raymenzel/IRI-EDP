@@ -1,9 +1,9 @@
 makefile_path := $(realpath $(dir $(realpath $(lastword $(MAKEFILE_LIST)))))
 
-CC = gcc
-CFLAGS = -g -O0 -Wall -Wextra -pedantic -std=gnu99
-FC = gfortran
-FCFLAGS = -g -O0 -Wall -Wextra -pedantic
+CC ?= gcc
+CFLAGS ?= -g -O0 -Wall -Wextra -pedantic -std=gnu99
+FC ?= gfortran
+FCFLAGS ?= -g -O0 -Wall -Wextra -pedantic
 
 IRI_SOURCES = $(makefile_path)/IRI-2016/irisub.for \
               $(makefile_path)/IRI-2016/irifun.for \
@@ -30,10 +30,16 @@ argparse.o: $(makefile_path)/src/argparse.c
 iri-2016.x: iri_2016.o argparse.o iri_c_interface.o
 	$(FC) -o $@ $^ -L$(makefile_path) -liri2016 -lm -fPIC -Wl,-rpath $(makefile_path)
 
-test: test/test_iri_c_interface.f90
+test.x: test/test_iri_c_interface.f90 iri_c_interface.o
 	$(FC) $(FCFLAGS) -o $@ $^ -L$(makefile_path) -liri2016 -fPIC -Wl,-rpath $(makefile_path)
+
+test: test.x
+	cp test.x run
+	cd run && ./test.x
+	bash test/test.bash
 
 clean:
 	rm -f iri-2016.x
 	rm -f libiri2016.so
 	rm -f *.o *.mod
+	rm -f test.x
