@@ -1,6 +1,7 @@
 #!/bin/bash -e
 
 test_directory=$(realpath "$(dirname "${BASH_SOURCE[0]}")")
+cp $test_directory/../iri-2016.x $test_directory/../run
 cd $test_directory/../run
 
 # Run the executable.
