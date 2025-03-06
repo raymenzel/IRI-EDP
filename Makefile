@@ -36,7 +36,7 @@ test.x: $(makefile_path)/test/test_iri_c_interface.f90 iri_c_interface.o
 compare_logs.x: $(makefile_path)/test/compare_logs.c
 	$(CC) $(CFLAGS) -o $@ $^ -lm
 
-check: test.x compare_logs.x
+check: all test.x compare_logs.x
 	cp test.x run
 	cd run && ./test.x
 	bash test/test.bash

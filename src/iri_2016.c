@@ -64,6 +64,11 @@ int main(int argc, char ** argv)
 
     get_argument(parser, "month", buffer);
     int month = atoi(buffer);
+    if (month < 1 || month > 12)
+    {
+        fprintf(stderr, "Error: the input month %d must be >= 1 and <= 12.\n", month);
+        return EXIT_FAILURE;
+    }
 
     get_argument(parser, "day", buffer);
     int day = atoi(buffer);
@@ -80,6 +85,12 @@ int main(int argc, char ** argv)
 
     float altitude_lower = get_argument(parser, "-z", buffer) ? atof(buffer) : 80.;
     float altitude_upper = get_argument(parser, "-Z", buffer) ? atof(buffer) : 1000.;
+    if (altitude_lower >= altitude_upper)
+    {
+        fprintf(stderr, "Error: lower altitude (%e) >= upper altitude (%e).",
+                altitude_lower, altitude_upper);
+        return EXIT_FAILURE;
+    }
     float daltitude = get_argument(parser, "-dz", buffer) ? atof(buffer) : 20.;
     int output_type = get_argument(parser, "-p", buffer) ? 1 : 0;
 
