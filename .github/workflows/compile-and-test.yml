@@ -20,5 +20,7 @@ jobs:
         run: bash download-IRI-2016.bash
       - name: Compile
         run: make
+      - name: make test
+        run: make test
       - name: Run the example.
         run: bash example.bash
