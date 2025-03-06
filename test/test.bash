@@ -17,7 +17,7 @@ if [ ! -f "2019-03-01-12-UTC-EDP.png" ]; then
 fi
 
 # Compare the log file to the expected one.
-diff iri_2016.log $test_directory/iri_2016.log
+../compare_logs.x iri_2016.log $test_directory/iri_2016.log
 if [ "$?" -ne "0" ]; then
   echo "iri-2016.x did not produce the expected data."
   exit 1

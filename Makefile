@@ -30,10 +30,13 @@ argparse.o: $(makefile_path)/src/argparse.c
 iri-2016.x: iri_2016.o argparse.o iri_c_interface.o
 	$(FC) -o $@ $^ -L$(makefile_path) -liri2016 -lm -fPIC -Wl,-rpath $(makefile_path)
 
-test.x: test/test_iri_c_interface.f90 iri_c_interface.o
+test.x: $(makefile_path)/test/test_iri_c_interface.f90 iri_c_interface.o
 	$(FC) $(FCFLAGS) -o $@ $^ -L$(makefile_path) -liri2016 -fPIC -Wl,-rpath $(makefile_path)
 
-test: test.x
+compare_logs.x: $(makefile_path)/test/compare_logs.c
+	$(CC) $(CFLAGS) -o $@ $^ -lm
+
+test: test.x compare_logs.x
 	cp test.x run
 	cd run && ./test.x
 	bash test/test.bash

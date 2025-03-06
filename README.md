@@ -21,8 +21,8 @@ $ sudo docker build -t iri-edp:latest .
 After building the image, you can enter the container environment by running:
 
 ```
-$ sudo docker run -it --entrypoint /bin/bash iri-edp:latest \
-    --mount type=bind,src=<host-path>,dst=/IRI-EDP/outputs
+$ sudo docker run --mount type=bind,src=<host-path>,dst=/IRI-EDP/output \
+    -it --entrypoint /bin/bash iri-edp:latest
 ```
 
 Fill in `<host-path>` with the location you want the generated figures to go to.
